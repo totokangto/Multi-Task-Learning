@@ -90,7 +90,9 @@ def main():
     model = get_model(p)
     model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model).cuda()
     # model = model.cuda()
-    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
+
+    # default : find_unused_parameters=False)
+    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=False)
 
     # Get criterion
     criterion = get_criterion(p).cuda()
