@@ -7,7 +7,7 @@
 # License: Attribution-NonCommercial 4.0 International
 
 import torch
-import collections
+import collections.abc
 import re
 int_classes = int
 string_classes = str
@@ -69,13 +69,14 @@ def collate_mil(batch):
     elif isinstance(batch[0], string_classes):
         return batch
 
-    elif isinstance(batch[0], collections.Mapping):
+    # python 3.10 : collections -> collections.abc
+    elif isinstance(batch[0], collections.abc.Mapping):
         batch_modified = {key: collate_mil([d[key] for d in batch]) for key in batch[0] if key.find('idx') < 0}
         if 'edgeidx' in batch[0]:
             batch_modified['edgeidx'] = [batch[x]['edgeidx'] for x in range(len(batch))]
         return batch_modified
 
-    elif isinstance(batch[0], collections.Sequence):
+    elif isinstance(batch[0], collections.abc.Sequence):
         out = []
         for samples in batch:
             out.append(collate_mil(samples))

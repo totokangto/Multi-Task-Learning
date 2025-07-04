@@ -86,6 +86,7 @@ class NYUD_MT(data.Dataset):
         _splits_dir = os.path.join(root, 'gt_sets')
 
         print('Initializing dataloader for NYUD {} set'.format(''.join(self.split)))
+
         for splt in self.split:
             with open(os.path.join(os.path.join(_splits_dir, splt + '.txt')), 'r') as f:
                 lines = f.read().splitlines()
@@ -93,13 +94,13 @@ class NYUD_MT(data.Dataset):
             for ii, line in enumerate(lines):
 
                 # Images
-                _image = os.path.join(_image_dir, line + '.png')
+                _image = os.path.join(_image_dir, line + '.jpg') # png
                 assert os.path.isfile(_image)
                 self.images.append(_image)
                 self.im_ids.append(line.rstrip('\n'))
 
                 # Edges
-                _edge = os.path.join(self.root, _edge_gt_dir, line + '.png')
+                _edge = os.path.join(self.root, _edge_gt_dir, line + '.npy') # png, edge 읽어오는 코드 수정
                 assert os.path.isfile(_edge)
                 self.edges.append(_edge)
 
@@ -109,7 +110,7 @@ class NYUD_MT(data.Dataset):
                 self.semsegs.append(_semseg)
 
                 # Surface Normals
-                _normal = os.path.join(self.root, _normal_gt_dir, line + '.png')
+                _normal = os.path.join(self.root, _normal_gt_dir, line + '.npy') # png, normal 읽어오는 코드 수정
                 assert os.path.isfile(_normal)
                 self.normals.append(_normal)
 
@@ -186,7 +187,8 @@ class NYUD_MT(data.Dataset):
         return _img
 
     def _load_edge(self, index):
-        _edge = Image.open(self.edges[index])
+        # _edge = Image.open(self.edges[index])
+        _edge = np.load(self.edges[index])
         _edge = np.expand_dims(np.array(_edge, dtype=np.float32, copy=False), axis=2) / 255.
         return _edge
 
@@ -203,7 +205,8 @@ class NYUD_MT(data.Dataset):
         return _depth
 
     def _load_normals(self, index):
-        _normals = Image.open(self.normals[index])
+        # _normals = Image.open(self.normals[index])
+        _normals = np.load(self.normals[index])
         _normals = 2 * np.array(_normals, dtype=np.float32, copy=False) / 255. - 1
         return _normals
 
